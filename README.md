@@ -13,6 +13,21 @@ LibreTV Next.js 迁移版：免费在线视频聚合搜索与观看平台。基�
  <a href="https://trendshift.io/repositories/26551?utm_source=repository-badge&amp;utm_medium=badge&amp;utm_campaign=badge-repository-26551" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/26551" alt="LibreSpark%2FLibreTV | Trendshift" width="250" height="55"/></a> <a href="https://trendshift.io/repositories/26551?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-26551" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/26551/weekly?language=JavaScript" alt="LibreSpark%2FLibreTV | Trendshift" width="250" height="55"/></a>
 </p>
 
+## macOS 桌面版（本仓库）
+
+本仓库在 LibreTV 源码上加了 Electron 外壳（`electron/main.js`）：App 启动时在本机 `127.0.0.1:47654` 运行完整的 Next.js 服务（搜索、代理、直播等 API 全在本地），窗口直接加载它，不依赖任何线上部署。
+
+```bash
+cp electron/app.env.example electron/app.env   # 填 PASSWORD，可选 DEFAULT_SOURCES 等
+npm install
+npm run app:dev     # 构建并以开发模式打开
+npm run app:dist    # 打包 dist/LibreTV-<版本>-arm64.dmg
+```
+
+- 改密码/预置源无需重新打包：写到 `~/Library/Application Support/LibreTV/app.env`（优先级更高）。
+- 观看历史、源配置存在 App 本地（IndexedDB）；从网页版迁移请用 设置 → 配置导入导出。
+- App 未签名，首次打开需右键 → 打开。
+
 ## 核心特性
 
 - **聚合搜索**：多采集站服务端并行搜索
