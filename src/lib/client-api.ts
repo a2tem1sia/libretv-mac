@@ -1,6 +1,7 @@
 'use client';
 
 import type { SearchResponse, SearchStreamEvent, SourceSearchOutcome, VideoDetail, DoubanResponse, BangumiCalendarResponse, AuthStatusResponse, SourceConfig, SearchResultItem, LivePlaylistResponse, LiveEpgResponse, SourceListPayload, QualityProbeItem, QualityProbeResult } from './types';
+import type { SkipSegment } from './skip-marks';
 
 /**
  * 客户端 API 封装。401 时触发全局事件打开登录框，
@@ -116,6 +117,17 @@ export const api = {
     }),
 
   logout: () => request<{ success: boolean }>('/api/auth', { method: 'DELETE' }),
+
+  /** 相邻两集比对音频，识别片头片尾（仅桌面版可用，其余部署返回 501） */
+  skipDetect: (a: string, b: string, adFilter: boolean) =>
+    request<{ a: { duration: number; segments: SkipSegment[] }; b: { duration: number; segments: SkipSegment[] } }>(
+      '/api/skip-detect',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ a, b, adFilter }),
+      }
+    ),
 
   /**
    * 聚合搜索。传入 onSource 时走 /api/search?stream=1 的 NDJSON 流：

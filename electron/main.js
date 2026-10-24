@@ -30,7 +30,16 @@ function startServer() {
   };
   server = utilityProcess.fork(path.join(serverDir, 'server.js'), [], {
     cwd: serverDir,
-    env: { ...process.env, ...env, NODE_ENV: 'production', PORT: String(PORT), HOSTNAME: '127.0.0.1', NEXT_TELEMETRY_DISABLED: '1' },
+    env: {
+      ...process.env,
+      ...env,
+      // 片头片尾识别用的 ffmpeg：打包版在 Resources，开发时用 ffmpeg-static
+      FFMPEG_PATH: app.isPackaged ? path.join(root, 'ffmpeg') : require('ffmpeg-static'),
+      NODE_ENV: 'production',
+      PORT: String(PORT),
+      HOSTNAME: '127.0.0.1',
+      NEXT_TELEMETRY_DISABLED: '1',
+    },
     stdio: 'inherit',
   });
   server.on('exit', (code) => {
@@ -64,6 +73,8 @@ function createWindow() {
     title: 'LibreTV',
     webPreferences: { contextIsolation: true, sandbox: true },
   });
+  // 窗口标题固定为 LibreTV，不跟随网页 <title>
+  win.on('page-title-updated', (e) => e.preventDefault());
   // 站外链接交给系统浏览器
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (!url.startsWith(URL)) shell.openExternal(url);

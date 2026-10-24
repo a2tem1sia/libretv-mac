@@ -34,13 +34,19 @@ import {
   upsertHistory,
   db,
 } from '@/lib/db';
-import { cn } from '@/lib/utils';
+import { cn, formatTime } from '@/lib/utils';
+import { ApiError } from '@/lib/client-api';
 
 /**
  * 播放页（唯一入口，替代旧版 watch.html → player.html 跳转链）。
  * 状态全部由 URL 驱动：/watch?source=xx&id=..&index=..&title=..
  * 集数列表由服务端详情接口获取；进度与历史走 IndexedDB。
  */
+/** 片头片尾自动识别：本次会话内进行中 / 失败过的集，避免重复请求；501 表示当前部署不支持 */
+const detectingKeys = new Set<string>();
+const failedKeys = new Set<string>();
+let skipDetectUnsupported = false;
+
 export default function WatchPage() {
   return (
     <Suspense>
@@ -138,6 +144,41 @@ function WatchContent() {
   );
   const skipMark = store.skipMarks[markKey];
   const markedCount = skipMark?.segments.length ?? 0;
+
+  // 自动识别的片头片尾按集保存；手动标记过的剧以手动为准，不再识别
+  const episodeKey = `${sourceKey}:${vodId}:${currentIndex}`;
+  const autoMark = store.autoSkipMarks[episodeKey];
+  const effectiveMark = markedCount > 0 ? skipMark : autoMark;
+  const [detecting, setDetecting] = useState(false);
+  useEffect(() => {
+    if (!verified || !vodId || markedCount > 0 || episodes.length < 2 || skipDetectUnsupported) return;
+    if (useAppStore.getState().autoSkipMarks[episodeKey] || detectingKeys.has(episodeKey) || failedKeys.has(episodeKey)) return;
+    const neighbor = currentIndex + 1 < episodes.length ? currentIndex + 1 : currentIndex - 1;
+    const neighborKey = `${sourceKey}:${vodId}:${neighbor}`;
+    let active = true;
+    detectingKeys.add(episodeKey);
+    setDetecting(true);
+    // 切集不取消：识别结果仍然有效，写入后下次播放直接命中
+    api
+      .skipDetect(episodes[currentIndex], episodes[neighbor], useAppStore.getState().adFilter)
+      .then((r) => {
+        const { setAutoSkipMark } = useAppStore.getState();
+        setAutoSkipMark(episodeKey, r.a.segments);
+        setAutoSkipMark(neighborKey, r.b.segments);
+      })
+      .catch((err) => {
+        if (err instanceof ApiError && err.status === 501) skipDetectUnsupported = true;
+        else failedKeys.add(episodeKey);
+      })
+      .finally(() => {
+        detectingKeys.delete(episodeKey);
+        if (active) setDetecting(false);
+      });
+    return () => {
+      active = false;
+      setDetecting(false);
+    };
+  }, [verified, vodId, sourceKey, markedCount, episodes, currentIndex, episodeKey]);
 
   // 中段两步态的起点：页面层持有，面板按钮与 Shift+S/E 共用同一份状态
   const [pendingStart, setPendingStart] = useState<number | null>(null);
@@ -321,7 +362,7 @@ function WatchContent() {
                   title={videoTitle}
                   adFilter={store.adFilter}
                   autoplayNext={store.autoplayNext}
-                  skipMark={skipMark}
+                  skipMark={effectiveMark}
                   autoSkipSegments={store.autoSkipSegments}
                   pendingStart={pendingStart}
                   onPendingStart={setPendingStart}
@@ -391,6 +432,37 @@ function WatchContent() {
                   <span className="ml-1 inline-block size-1.5 rounded-full bg-faint" aria-label="本剧跳过已关闭" />
                 )}
               </button>
+              {markedCount === 0 && detecting && (
+                <span className="flex items-center gap-1.5 text-xs text-faint">
+                  <Spinner size="sm" />
+                  正在识别片头片尾…
+                </span>
+              )}
+              {markedCount === 0 && !detecting && autoMark && (
+                autoMark.segments.length > 0 ? (
+                  <label
+                    className="flex items-center gap-1.5 text-xs text-muted cursor-pointer"
+                    title="与相邻一集比对音频自动识别；手动标记后以手动为准"
+                  >
+                    <input
+                      type="checkbox"
+                      className="h-3.5 w-3.5 accent-[#2563eb]"
+                      checked={autoMark.enabled}
+                      onChange={(e) => store.setAutoSkipEnabled(episodeKey, e.target.checked)}
+                    />
+                    本集跳过
+                    {autoMark.segments
+                      .map((seg) => {
+                        const isHead = seg.type === 'opening' || (seg.type === 'middle' && seg.start < 300);
+                        const end = seg.end < 0 ? '结尾' : formatTime(seg.end);
+                        return `${isHead ? '片头' : '片尾'} ${formatTime(seg.start)}–${end}`;
+                      })
+                      .join(' · ')}
+                  </label>
+                ) : (
+                  <span className="text-xs text-faint">未识别到片头片尾</span>
+                )
+              )}
               <label className="flex items-center gap-1.5 text-xs text-muted ml-auto cursor-pointer">
                 <input
                   type="checkbox"

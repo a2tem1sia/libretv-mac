@@ -26,6 +26,8 @@ export interface AppSettings {
   autoplayNext: boolean;
   /** 跳过片段：按归一化剧名持久化，详见 lib/skip-marks.ts */
   skipMarks: Record<string, SkipMark>;
+  /** 自动识别的片头片尾：按集（source:vodId:index）持久化，enabled 为本集开关；segments 为空表示识别过但没找到 */
+  autoSkipMarks: Record<string, SkipMark>;
   /**
    * 自动跳过标记的片段：片头/中段跳到片段末尾，片尾则直接结束本集。
    * 三类都是「标记区间 → 不播」，所以共用同一个开关；是否连播下一集仍由 autoplayNext 决定。
@@ -290,6 +292,10 @@ interface AppState extends AppSettings {
   clearSkipMark: (key: string) => void;
   /** 清除全部跳过片段（设置面板的「清除全部」入口） */
   clearAllSkipMarks: () => void;
+  /** 写入自动识别结果（按集） */
+  setAutoSkipMark: (key: string, segments: SkipSegment[]) => void;
+  /** 本集是否跳过自动识别出的片段 */
+  setAutoSkipEnabled: (key: string, enabled: boolean) => void;
   markEnvSubsSeen: (urls: string[]) => void;
   updateSettings: (patch: Partial<Omit<AppSettings, 'customAPIs' | 'selectedKeys'>>) => void;
 }
@@ -336,6 +342,7 @@ export const useAppStore = create<AppState>()(
       recommendSourceTouched: false,
       autoplayNext: true,
       skipMarks: {},
+      autoSkipMarks: {},
       // 自动跳过默认开启，但只有用户真正标记过片段才生效
       autoSkipSegments: true,
       // 直连优先：豆瓣封面有公共镜像 + 内置代理两级兜底（见 buildImageCandidates），
@@ -813,6 +820,25 @@ export const useAppStore = create<AppState>()(
 
       clearAllSkipMarks: () => set({ skipMarks: {} }),
 
+      setAutoSkipMark: (key, segments) => {
+        const marks = { ...get().autoSkipMarks };
+        marks[key] = { segments, enabled: marks[key]?.enabled ?? true, updatedAt: Date.now() };
+        // 只留最近 1000 集，防止 localStorage 无限增长
+        const keys = Object.keys(marks);
+        if (keys.length > 1000) {
+          keys.sort((x, y) => marks[x].updatedAt - marks[y].updatedAt);
+          for (const k of keys.slice(0, keys.length - 1000)) delete marks[k];
+        }
+        set({ autoSkipMarks: marks });
+      },
+
+      setAutoSkipEnabled: (key, enabled) => {
+        const marks = get().autoSkipMarks;
+        const mark = marks[key];
+        if (!mark || mark.enabled === enabled) return;
+        set({ autoSkipMarks: { ...marks, [key]: { ...mark, enabled, updatedAt: Date.now() } } });
+      },
+
       updateSettings: (patch) => {
         // 用户主动修改推荐数据源 / 封面图加载方式时打上「已选择」标记：此后部署者的
         // DEFAULT_RECOMMEND_SOURCE / DEFAULT_IMAGE_MODE 默认值不再覆盖该用户的选择
@@ -933,6 +959,7 @@ export const useAppStore = create<AppState>()(
         recommendSourceTouched: s.recommendSourceTouched,
         autoplayNext: s.autoplayNext,
         skipMarks: s.skipMarks,
+        autoSkipMarks: s.autoSkipMarks,
         autoSkipSegments: s.autoSkipSegments,
         imageProxyMode: s.imageProxyMode,
         imageProxyModeTouched: s.imageProxyModeTouched,
