@@ -33,6 +33,8 @@ export interface AppSettings {
    * 三类都是「标记区间 → 不播」，所以共用同一个开关；是否连播下一集仍由 autoplayNext 决定。
    */
   autoSkipSegments: boolean;
+  /** 画质增强档位（0 关 / 1 标准 / 2 强），见 lib/video-enhance.ts */
+  videoEnhance: 0 | 1 | 2;
   imageProxyMode: 'direct' | 'proxy' | 'custom';
   /** 用户是否在设置中主动选择过封面图加载方式；为 false 时部署者的 DEFAULT_IMAGE_MODE 默认值可生效 */
   imageProxyModeTouched: boolean;
@@ -345,6 +347,7 @@ export const useAppStore = create<AppState>()(
       autoSkipMarks: {},
       // 自动跳过默认开启，但只有用户真正标记过片段才生效
       autoSkipSegments: true,
+      videoEnhance: 0,
       // 直连优先：豆瓣封面有公共镜像 + 内置代理两级兜底（见 buildImageCandidates），
       // 默认省服务器流量；老用户保持已持久化的选择不受影响。
       // 部署者可用 DEFAULT_IMAGE_MODE=proxy 下发内置代理优先（最稳定，吃服务器流量）
@@ -961,6 +964,7 @@ export const useAppStore = create<AppState>()(
         skipMarks: s.skipMarks,
         autoSkipMarks: s.autoSkipMarks,
         autoSkipSegments: s.autoSkipSegments,
+        videoEnhance: s.videoEnhance,
         imageProxyMode: s.imageProxyMode,
         imageProxyModeTouched: s.imageProxyModeTouched,
         customImageProxy: s.customImageProxy,

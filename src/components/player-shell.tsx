@@ -12,6 +12,8 @@ import {
 } from '@/lib/video-prefetcher';
 import { loadCacheSettings } from '@/lib/video-cache';
 import { formatTime } from '@/lib/utils';
+import { VideoEnhancer, type EnhanceLevel } from '@/lib/video-enhance';
+import { useAppStore } from '@/lib/store';
 import { prefersTouchPointer } from '@/lib/touch-pointer';
 import {
   findActiveSegment,
@@ -564,6 +566,31 @@ export function PlayerShell({
     });
     artRef.current = art;
 
+    // 画质增强：设置面板切档，档位全局记忆
+    let enhancer: VideoEnhancer | null = null;
+    try {
+      enhancer = new VideoEnhancer(art.video, (msg) => {
+        art.notice.show = msg;
+      });
+      const initial = useAppStore.getState().videoEnhance;
+      enhancer.setLevel(initial);
+      const labels: Record<EnhanceLevel, string> = { 0: '关闭', 1: '标准', 2: '强' };
+      art.setting.add({
+        html: '画质增强',
+        selector: ([0, 1, 2] as EnhanceLevel[]).map((level) => ({
+          html: labels[level],
+          default: level === initial,
+        })),
+        onSelect: (item) => {
+          const level = ([0, 1, 2] as EnhanceLevel[]).find((l) => labels[l] === item.html) ?? 0;
+          enhancer?.setLevel(level);
+          useAppStore.getState().updateSettings({ videoEnhance: level });
+        },
+      });
+    } catch {
+      /* 无 WebGL 时不提供该选项 */
+    }
+
     // 进度条区间可视化：初始渲染一次，换集 duration 变化时重绘
     renderSkipMarks();
     art.on('video:durationchange', renderSkipMarks);
@@ -915,6 +942,7 @@ export function PlayerShell({
       getVideoPrefetcher().stop();
       // 播放页可能仍持有读取接口：销毁前显式置空，避免「记录当前」读到已销毁实例
       propsRef.current.onPlayerApi?.(null);
+      enhancer?.destroy();
       art.destroy();
       artRef.current = null;
     };
