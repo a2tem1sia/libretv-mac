@@ -284,6 +284,54 @@ function stripInterstitialAdGroups(m3u8Content: string): string {
   return lines.filter((_, idx) => !drop[idx]).join('\n');
 }
 
+/** 序号插入广告段的时长上限：超过则不动，避免误删正片 */
+const SEQUENCE_AD_MAX_SECONDS = 90;
+
+/** 分片文件名末尾的序号（去掉查询串与扩展名）；无序号返回 null */
+function segmentNumber(line: string): { prefix: string; n: number } | null {
+  const name = line.trim().split('?')[0].split('/').pop() ?? '';
+  const m = name.replace(/\.[a-z0-9]+$/i, '').match(/^(.*?)(\d{1,15})$/);
+  return m ? { prefix: m[1], n: Number(m[2]) } : null;
+}
+
+/**
+ * 剔除「打断正片序号」的插入段（量子等源的赌场中插广告）：
+ * 正片分片按序号连续命名（…073.ts → …074.ts），广告段被插在两者之间、序号自成一套。
+ * 判定：前一组末片与后一组首片序号相连（同前缀、相差 1），而本组首片不接续前一组，
+ * 且本组 ≤ 90s——正片绝不会被夹在两个相连序号之间，因此几乎不会误删。
+ */
+function stripSequenceBreakAdGroups(m3u8Content: string): string {
+  if (!m3u8Content) return '';
+  const lines = m3u8Content.split('\n');
+  const isDisc = (l: string) => l.trim() === '#EXT-X-DISCONTINUITY';
+  const isSegment = (l: string) => {
+    const t = l.trim();
+    return t !== '' && !t.startsWith('#');
+  };
+  const groups = scanGroups(lines, isDisc, isSegment);
+  const segs = (g: AdGroupScan) => lines.slice(g.start, g.end).filter(isSegment);
+
+  const drop = new Array<boolean>(lines.length).fill(false);
+  for (let k = 1; k < groups.length - 1; k++) {
+    const g = groups[k];
+    if (g.count === 0 || g.discLine < 0 || g.seconds > SEQUENCE_AD_MAX_SECONDS) continue;
+    const prevLast = segmentNumber(segs(groups[k - 1]).pop() ?? '');
+    const nextFirst = segmentNumber(segs(groups[k + 1])[0] ?? '');
+    const first = segmentNumber(segs(g)[0] ?? '');
+    if (!prevLast || !nextFirst) continue;
+    if (prevLast.prefix !== nextFirst.prefix || nextFirst.n !== prevLast.n + 1) continue;
+    if (first && first.prefix === prevLast.prefix && first.n === prevLast.n + 1) continue;
+    drop[g.discLine] = true;
+    for (let i = g.start; i < g.end; i++) {
+      const t = lines[i].trim();
+      if (t.startsWith('#EXT-X-KEY') || t.startsWith('#EXT-X-MAP')) continue;
+      drop[i] = true;
+    }
+  }
+  if (!drop.some(Boolean)) return m3u8Content;
+  return lines.filter((_, idx) => !drop[idx]).join('\n');
+}
+
 /** 清除首个分片之前的 DISCONTINUITY：其前没有媒体内容，标记无语义（hls.js 的 cc 从 0 开始） */
 function stripLeadingDisc(content: string): string {
   const lines = content.split('\n');
@@ -301,9 +349,12 @@ function stripLeadingDisc(content: string): string {
  * 1. URL 特征中插段（adjump 等，任意位置）；
  * 2. 长正片段之间的超短插入段（纯时长型中插广告）；
  * 3. 片头无特征插入段（dytt 式，位置+短小启发式）；
+ * 4. 打断正片序号的插入段（序号前后相连，中间夹一段异号分片）；
  * 最后统一清掉首分片前失去语义的 DISCONTINUITY。
  */
 export function stripAdGroups(m3u8Content: string): string {
   if (!m3u8Content) return '';
-  return stripLeadingDisc(stripLeadAdGroup(stripInterstitialAdGroups(stripMarkedAdGroups(m3u8Content))));
+  return stripLeadingDisc(
+    stripLeadAdGroup(stripSequenceBreakAdGroups(stripInterstitialAdGroups(stripMarkedAdGroups(m3u8Content))))
+  );
 }

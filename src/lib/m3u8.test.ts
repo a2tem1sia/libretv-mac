@@ -291,3 +291,41 @@ describe('parseM3u8Playlist · 片头广告剔除', () => {
     expect(parsed.segments).toHaveLength(2);
   });
 });
+
+describe('stripAdGroups · 打断正片序号的中插（量子赌场广告结构）', () => {
+  const group = (names: string[], dur = 4) =>
+    ['#EXT-X-DISCONTINUITY', ...names.flatMap((n) => [`#EXTINF:${dur},`, n])];
+  const main = (from: number, to: number) =>
+    Array.from({ length: to - from + 1 }, (_, i) => `dbe3a7e3b93${String(from + i).padStart(6, '0')}.ts`);
+  const head = ['#EXTM3U', '#EXT-X-VERSION:3', '#EXT-X-TARGETDURATION:9'];
+
+  it('removes an ad group spliced between consecutive main segments', () => {
+    const ad = ['dbe3a7e3b930732367.ts', 'dbe3a7e3b930732368.ts', 'dbe3a7e3b930732369.ts'];
+    const text = [
+      ...head,
+      ...[0, 10, 20, 30, 40, 50, 64].flatMap((n) => group(main(n, n === 64 ? 73 : n + 9))),
+      ...group(ad),
+      ...[74, 84, 94].flatMap((n) => group(main(n, n + 9))),
+      '#EXT-X-ENDLIST',
+    ].join('\n');
+    const out = stripAdGroups(text);
+    expect(out).not.toContain('0732367');
+    expect(out).toContain('dbe3a7e3b93000073.ts');
+    expect(out).toContain('dbe3a7e3b93000074.ts');
+    expect(out).toContain('dbe3a7e3b93000000.ts');
+    expect(out.match(/#EXT-X-DISCONTINUITY/g)?.length).toBe(9);
+  });
+
+  it('keeps groups that continue the numbering', () => {
+    const text = [
+      ...head,
+      ...[0, 10, 20, 30, 40].flatMap((n) => group(main(n, n + 9))),
+      ...group(main(50, 54)),
+      ...[55, 65].flatMap((n) => group(main(n, n + 9))),
+      '#EXT-X-ENDLIST',
+    ].join('\n');
+    // 首个 DISCONTINUITY 会被既有逻辑清掉，这里只关心分片一个不少
+    const count = (t: string) => t.split('\n').filter((l) => l.endsWith('.ts')).length;
+    expect(count(stripAdGroups(text))).toBe(count(text));
+  });
+});
