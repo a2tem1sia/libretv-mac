@@ -50,7 +50,7 @@ function DoubanView({ onPick }: { onPick: (title: string) => void }) {
     <section aria-label="影视推荐">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className="flex bg-chip rounded-lg p-0.5">
+          <div className="flex bg-card rounded-full p-1">
             <TypeButton active={type === 'movie'} onClick={() => switchType('movie')}>
               电影
             </TypeButton>
@@ -66,8 +66,8 @@ function DoubanView({ onPick }: { onPick: (title: string) => void }) {
           <button
             key={t}
             className={cn(
-              'px-3 py-1.5 rounded-full text-[13px] transition-colors',
-              t === tag ? 'bg-content text-page' : 'bg-chip text-muted hover:text-content hover:bg-hover'
+              'px-3 h-8 rounded-full text-[13px] transition-colors',
+              t === tag ? 'bg-hover text-content font-medium' : 'text-faint hover:text-content'
             )}
             onClick={() => setTag(t)}
           >
@@ -83,7 +83,7 @@ function DoubanView({ onPick }: { onPick: (title: string) => void }) {
       ) : items.length === 0 ? (
         <p className="text-center text-sm text-faint py-8">该分类暂无推荐内容</p>
       ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-x-4 gap-y-6">
           {items.map((item) => (
             <DoubanCard key={item.id} item={item} onClick={() => onPick(item.title)} />
           ))}
@@ -127,7 +127,7 @@ function BangumiView({ onPick }: { onPick: (title: string) => void }) {
       ) : query.isLoading ? (
         <GridSkeleton />
       ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-x-4 gap-y-6">
           {items.map((item) => (
             <DoubanCard key={item.id} item={item} onClick={() => onPick(item.title)} />
           ))}
@@ -172,7 +172,7 @@ function HotListView({ onPick }: { onPick: (title: string) => void }) {
       ) : query.isLoading ? (
         <GridSkeleton />
       ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-x-4 gap-y-6">
           {items.map((item) => (
             <DoubanCard key={item.id} item={item} onClick={() => onPick(item.title)} />
           ))}
@@ -184,7 +184,7 @@ function HotListView({ onPick }: { onPick: (title: string) => void }) {
 
 function GridSkeleton() {
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-x-4 gap-y-6">
       {Array.from({ length: 16 }).map((_, i) => (
         <div key={i}>
           <div className="aspect-[2/3] rounded-lg bg-chip" />
@@ -199,8 +199,8 @@ function ChipButton({ active, onClick, children }: { active: boolean; onClick: (
   return (
     <button
       className={cn(
-        'px-3 py-1.5 rounded-full text-[13px] transition-colors',
-        active ? 'bg-content text-page' : 'bg-chip text-muted hover:text-content hover:bg-hover'
+        'px-3 h-8 rounded-full text-[13px] transition-colors',
+        active ? 'bg-hover text-content font-medium' : 'text-faint hover:text-content'
       )}
       onClick={onClick}
     >
@@ -212,7 +212,7 @@ function ChipButton({ active, onClick, children }: { active: boolean; onClick: (
 function TypeButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
-      className={cn('px-3.5 py-1.5 rounded-md text-sm transition-colors', active ? 'bg-hover text-content' : 'text-muted hover:text-content')}
+      className={cn('px-4 h-8 rounded-full text-sm transition-colors', active ? 'bg-content text-page font-medium' : 'text-muted hover:text-content')}
       onClick={onClick}
       aria-pressed={active}
     >

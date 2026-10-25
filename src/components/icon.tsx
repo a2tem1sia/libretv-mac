@@ -25,9 +25,27 @@ export type IconName =
   | 'alert'
   | 'gear'
   | 'home'
-  | 'play';
+  | 'play'
+  | 'tv'
+  | 'info';
 
 const PATHS: Record<IconName, ReactNode> = {
+  tv: (
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125Z"
+    />
+  ),
+  info: (
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+    />
+  ),
   play: <path strokeLinejoin="round" strokeWidth={2} fill="currentColor" d="M7 4.5v15l12.5-7.5L7 4.5Z" />,
   close: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />,
   edit: (

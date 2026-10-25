@@ -35,6 +35,7 @@ import {
   db,
 } from '@/lib/db';
 import { cn, formatTime } from '@/lib/utils';
+import { Switch } from '@/components/switch';
 import { ApiError } from '@/lib/client-api';
 
 /**
@@ -318,7 +319,7 @@ function WatchContent() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-40 bg-page border-b border-line">
-        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-3">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 h-16 flex items-center gap-3">
           <BackButton />
           <HomeButton />
           <div className="min-w-0">
@@ -352,11 +353,11 @@ function WatchContent() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-4">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4">
+      <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-8 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-3.5">
           <div>
             {/* data-ui：播放器自带控件（文字阴影等）属于真实界面，不按页面规则判 */}
-            <div ref={playerFrameRef} data-ui className="aspect-video bg-black rounded-lg overflow-hidden">
+            <div ref={playerFrameRef} data-ui className="aspect-video bg-black rounded-2xl overflow-hidden">
               {currentUrl ? (
                 <PlayerShell
                   url={currentUrl}
@@ -402,7 +403,7 @@ function WatchContent() {
             </div>
 
             {/* 操作栏 */}
-            <div className="flex flex-wrap items-center gap-2 mt-3">
+            <div className="flex flex-wrap items-center gap-2 mt-3.5">
               <button
                 className="btn-ghost btn-sm"
                 disabled={currentIndex <= 0}
@@ -433,38 +434,46 @@ function WatchContent() {
                   <span className="ml-1 inline-block size-1.5 rounded-full bg-faint" aria-label="本剧跳过已关闭" />
                 )}
               </button>
-              <label className="flex items-center gap-1.5 text-[13px] text-muted ml-auto cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 accent-[rgb(var(--c-accent))]"
-                  checked={store.autoplayNext}
-                  onChange={(e) => store.updateSettings({ autoplayNext: e.target.checked })}
-                />
+              <div className="flex items-center gap-2.5 text-[13px] text-muted ml-auto">
                 自动连播
-              </label>
+                <Switch
+                  label="自动连播"
+                  checked={store.autoplayNext}
+                  onChange={(v) => store.updateSettings({ autoplayNext: v })}
+                />
+              </div>
             </div>
 
             {/* 功能卡片：跳过片头片尾 / 画质增强 / 去广告 */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-              <FeatureCard title="跳过片头片尾">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-3.5">
+              <FeatureCard
+                title="跳过片头片尾"
+                action={
+                  markedCount === 0 &&
+                  !detecting &&
+                  autoMark &&
+                  autoMark.segments.length > 0 && (
+                    <Switch
+                      label="本集自动跳过片头片尾"
+                      checked={autoMark.enabled}
+                      onChange={(v) => store.setAutoSkipEnabled(episodeKey, v)}
+                    />
+                  )
+                }
+              >
                 {markedCount > 0 ? (
                   <p className="text-[13px] text-muted">本剧已手动标记 {markedCount} 段，以手动标记为准</p>
                 ) : detecting ? (
-                  <p className="flex items-center gap-1.5 text-[13px] text-faint">
-                    <Spinner size="sm" />
-                    正在识别片头片尾…
-                  </p>
+                  <>
+                    <p className="flex items-center gap-2 text-sm text-muted">
+                      <Spinner size="sm" />
+                      正在识别片头片尾…
+                    </p>
+                    <p className="text-[13px] text-faint">与相邻一集比对音频，约 20 秒</p>
+                  </>
                 ) : autoMark && autoMark.segments.length > 0 ? (
                   <>
-                    <label className="flex items-center justify-between gap-2 text-sm text-content cursor-pointer">
-                      本集自动跳过
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4 accent-[rgb(var(--c-accent))]"
-                        checked={autoMark.enabled}
-                        onChange={(e) => store.setAutoSkipEnabled(episodeKey, e.target.checked)}
-                      />
-                    </label>
+                    <p className="text-sm text-muted">{autoMark.enabled ? '本集自动跳过' : '本集不跳过'}</p>
                     <p className="text-[13px] text-faint tabular-nums" title="与相邻一集比对音频自动识别">
                       {autoMark.segments
                         .map((seg) => {
@@ -482,14 +491,14 @@ function WatchContent() {
                 )}
               </FeatureCard>
               <FeatureCard title="画质增强">
-                <div role="group" aria-label="画质增强档位" className="flex bg-chip rounded-lg p-0.5">
+                <div role="group" aria-label="画质增强档位" className="flex bg-hover rounded-full p-1">
                   {(['关闭', '标准', '强'] as const).map((label, level) => (
                     <button
                       key={label}
                       aria-pressed={store.videoEnhance === level}
                       className={cn(
-                        'flex-1 rounded-md py-1.5 text-[13px] transition-colors',
-                        store.videoEnhance === level ? 'bg-hover text-content' : 'text-muted hover:text-content'
+                        'flex-1 rounded-full h-7 text-[13px] transition-colors',
+                        store.videoEnhance === level ? 'bg-content text-page font-medium' : 'text-muted hover:text-content'
                       )}
                       onClick={() => store.updateSettings({ videoEnhance: level as 0 | 1 | 2 })}
                     >
@@ -499,16 +508,17 @@ function WatchContent() {
                 </div>
                 <p className="text-[13px] text-faint">低清片源全屏时效果最明显</p>
               </FeatureCard>
-              <FeatureCard title="去广告">
-                <label className="flex items-center justify-between gap-2 text-sm text-content cursor-pointer">
-                  自动去除插播广告
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 accent-[rgb(var(--c-accent))]"
+              <FeatureCard
+                title="去广告"
+                action={
+                  <Switch
+                    label="自动去除插播广告"
                     checked={store.adFilter}
-                    onChange={(e) => store.updateSettings({ adFilter: e.target.checked })}
+                    onChange={(v) => store.updateSettings({ adFilter: v })}
                   />
-                </label>
+                }
+              >
+                <p className="text-sm text-muted">{store.adFilter ? '自动去除插播广告' : '已关闭'}</p>
                 <p className="text-[13px] text-faint">切换后从下一次加载生效</p>
               </FeatureCard>
             </div>
@@ -536,7 +546,7 @@ function WatchContent() {
 
           {/* 剧集侧栏 */}
           {/* 桌面端剧集栏高度跟随左栏（播放器 + 卡片），列表在栏内滚动，两栏底边对齐 */}
-          <aside className="bg-card border border-line rounded-xl p-3 flex flex-col lg:h-0 lg:min-h-full">
+          <aside className="bg-card rounded-[20px] p-4 flex flex-col lg:h-0 lg:min-h-full">
             <div className="flex items-center justify-between gap-2 mb-2.5">
               <h2 className="text-sm font-semibold text-content">
                 剧集列表{episodes.length > 0 && `（${episodes.length}）`}
@@ -564,7 +574,7 @@ function WatchContent() {
                 <EmptyState variant="plain" title={detailQuery.isError ? '获取剧集失败' : '暂无剧集信息'} />
               )
             ) : (
-              <div className="flex flex-col gap-0.5 max-h-[65vh] lg:max-h-none lg:flex-1 lg:min-h-0 overflow-y-auto scrollbar-thin pr-1">
+              <div className="relative flex flex-col gap-0.5 max-h-[65vh] lg:max-h-none lg:flex-1 lg:min-h-0 overflow-y-auto scrollbar-thin pr-1">
                 {orderedEpisodes.map((realIndex) => (
                   <EpisodeButton
                     key={realIndex}
@@ -595,10 +605,13 @@ function WatchContent() {
   );
 }
 
-function FeatureCard({ title, children }: { title: string; children: React.ReactNode }) {
+function FeatureCard({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="bg-card border border-line rounded-xl p-3 flex flex-col gap-2">
-      <h3 className="text-sm font-semibold text-content">{title}</h3>
+    <section className="bg-card rounded-[20px] p-5 flex flex-col gap-2">
+      <div className="flex items-center justify-between gap-3 mb-1">
+        <h3 className="text-[15px] font-semibold text-content">{title}</h3>
+        {action}
+      </div>
       {children}
     </section>
   );
@@ -609,7 +622,15 @@ function EpisodeButton({ index, active, onClick }: { index: number; active: bool
   const ref = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (active) ref.current?.scrollIntoView({ block: 'nearest' });
+    if (!active) return;
+    // 只滚动剧集列表自身，不能用 scrollIntoView：它会连带滚动整页，把播放器滚出视口触发迷你窗
+    // shortcut: 桌面端剧集栏的高度要等播放器挂载后才确定，稍等再滚；以后可改为监听栏高度变化
+    const timer = setTimeout(() => {
+      const el = ref.current;
+      const box = el?.parentElement;
+      if (el && box) box.scrollTop = el.offsetTop - box.clientHeight / 2 + el.clientHeight / 2;
+    }, 400);
+    return () => clearTimeout(timer);
   }, [active]);
 
   return (

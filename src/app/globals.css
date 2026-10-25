@@ -36,26 +36,27 @@
 }
 
 .dark {
-  /* 沉浸式影院深色（Apple TV 风格）：中性纯黑底 + 系统蓝强调色 */
-  --c-page: 10 10 12;              /* #0a0a0c 页面底色 */
-  --c-surface: 22 22 24;           /* #161618 弹窗/抽屉底色 */
-  --c-surface-raised: 28 28 31;
-  --c-card: 18 18 20;              /* #121214 卡片底色 */
-  --c-chip: 28 28 31;              /* #1c1c1f 输入框/标签底色 */
-  --c-hover: 42 42 46;             /* #2a2a2e 悬停态 */
-  --c-line: 44 44 48;              /* #2c2c30 边框 */
-  --c-content: 245 245 247;        /* #f5f5f7 主文本 */
-  --c-muted: 174 174 178;          /* #aeaeb2 次级文本 */
-  --c-faint: 142 142 147;          /* #8e8e93 三级文本（抽屉底色上 5.6:1） */
-  --c-accent: 10 132 255;          /* #0a84ff 系统蓝 */
-  --c-accent-hover: 64 156 255;    /* #409cff */
-  --c-on-accent: 255 255 255;
-  --c-danger: 255 69 58;           /* #ff453a */
-  --c-danger-hover: 255 105 97;
-  --c-success: 48 209 88;          /* #30d158 */
-  --c-warning: 255 159 10;         /* #ff9f0a */
-  --c-info: 10 132 255;
-  --c-rating: 255 214 10;          /* #ffd60a */
+  /* 纯黑放映厅（true-black flat）：靠明度分层，不用边框和阴影；
+     唯一色相是放映机琥珀，只用在观看进度、片段标记等数据上，不上按钮和导航 */
+  --c-page: 0 0 0;                 /* #000 页面底色 */
+  --c-surface: 17 17 17;           /* #111 抽屉/弹窗 */
+  --c-surface-raised: 26 26 26;    /* #1a1a1a */
+  --c-card: 17 17 17;              /* #111 卡片：比底色亮一级 */
+  --c-chip: 30 30 30;              /* #1e1e1e 输入框/标签 */
+  --c-hover: 42 42 42;             /* #2a2a2a 嵌套面板/悬停/选中 */
+  --c-line: 31 31 31;              /* #1f1f1f 极弱分隔线 */
+  --c-content: 255 255 255;        /* #fff */
+  --c-muted: 180 180 180;          /* #b4b4b4 次级文字 */
+  --c-faint: 148 148 148;          /* #949494 元信息（#2a2a2a 上仍有 4.5:1） */
+  --c-accent: 242 179 61;          /* #f2b33d 放映机琥珀：仅用于数据 */
+  --c-accent-hover: 247 198 106;   /* #f7c66a */
+  --c-on-accent: 0 0 0;
+  --c-danger: 229 72 77;           /* #e5484d */
+  --c-danger-hover: 236 105 109;
+  --c-success: 70 190 120;         /* #46be78 */
+  --c-warning: 229 169 59;
+  --c-info: 120 170 255;
+  --c-rating: 242 179 61;
   --c-danger-solid: 185 28 28;
   --c-success-solid: 21 128 61;
   --c-warning-solid: 180 83 9;
@@ -71,8 +72,16 @@ body {
 
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC',
+  /* Inter 负责拉丁字母与数字，中文落到苹方 */
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+
+/* 桌面宽度下左侧固定侧栏，内容整体右移 */
+@media (min-width: 1024px) {
+  body:has(.app-sidebar) {
+    padding-left: 224px;
+  }
 }
 
 @layer components {
@@ -80,15 +89,16 @@ body {
     @apply bg-card border border-line rounded-lg overflow-hidden transition-[transform,background-color] duration-200;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
     /* 统一焦点环：键盘用户可见，与 .input 同一规格 */
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40;
   }
+  /* 主按钮靠反相（白底黑字胶囊），强调色只留给数据 */
   .btn-primary {
-    @apply btn bg-accent text-on-accent hover:bg-accent-hover;
+    @apply btn rounded-full bg-content text-page font-medium hover:opacity-90;
   }
   .btn-ghost {
-    @apply btn bg-chip text-muted hover:bg-hover hover:text-content border border-line;
+    @apply btn rounded-full bg-transparent text-content border border-[rgb(68_68_68)] hover:bg-hover;
   }
   .input {
     @apply bg-chip border border-line rounded-md px-3 py-2 text-sm text-content placeholder:text-faint;

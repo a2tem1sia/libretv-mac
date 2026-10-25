@@ -400,7 +400,7 @@ export function DoubanCard({ item, onClick }: { item: { title: string; cover: st
 
   return (
     <div
-      className="group cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+      className="group cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-content/60"
       role="button"
       tabIndex={0}
       onClick={onClick}
@@ -412,7 +412,7 @@ export function DoubanCard({ item, onClick }: { item: { title: string; cover: st
         }
       }}
     >
-      <div className="relative aspect-[2/3] bg-chip rounded-lg overflow-hidden">
+      <div className="relative aspect-[2/3] bg-hover rounded-xl overflow-hidden">
         {item.cover && !imgFailed ? (
           <SmartImage
             url={item.cover}
@@ -434,7 +434,7 @@ export function DoubanCard({ item, onClick }: { item: { title: string; cover: st
         <div className="text-sm font-medium text-content truncate" title={item.title}>
           {item.title}
         </div>
-        {item.rating && <div className="text-[13px] text-faint tabular-nums">豆瓣 {item.rating}</div>}
+        {item.rating && <div className="text-xs text-faint tabular-nums mt-0.5">豆瓣 {item.rating}</div>}
       </div>
     </div>
   );

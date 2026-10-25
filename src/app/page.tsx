@@ -168,10 +168,10 @@ function HomeContent() {
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      <main className="relative flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+      <main className="relative flex-1 max-w-[1360px] w-full mx-auto px-4 sm:px-8 py-8">
         {/* 搜索区 */}
-        <section className="flex flex-wrap items-center gap-x-6 gap-y-3 mb-8">
-          <h1 className="text-2xl font-semibold text-content shrink-0">{urlQuery ? '搜索结果' : '影视库'}</h1>
+        <section className="flex flex-wrap items-center gap-x-8 gap-y-3 mb-10">
+          <h1 className="text-[28px] font-semibold text-content shrink-0">{urlQuery ? '搜索结果' : '影视库'}</h1>
           {/* 定位容器比胶囊宽一圈：浮层按它的宽度对齐，接缝处不会与胶囊边框错位 1px */}
           <div ref={searchHistory.containerRef} className="relative flex-1 min-w-[280px]">
             <form
@@ -193,8 +193,8 @@ function HomeContent() {
                   searchHistory.visible
                     ? // 展开时：外框（含上圆角）沿用输入框的聚焦样式不变，只把底边改为内部分隔线，
                       // 使输入区在展开状态下仍是边界清晰的独立输入框，而非与列表糊成一片
-                      'rounded-t-xl rounded-b-none border-accent border-b-line bg-surface-raised'
-                    : 'rounded-xl border-line bg-chip focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/40'
+                      'rounded-t-xl rounded-b-none border-[rgb(68_68_68)] border-b-line bg-surface-raised'
+                    : 'rounded-xl border-transparent bg-card focus-within:border-[rgb(68_68_68)]'
                 )}
               >
                 <input
