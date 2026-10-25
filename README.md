@@ -25,6 +25,7 @@ npm run app:dist    # 打包 dist/LibreTV-<版本>-arm64.dmg（Apple 芯片）�
 ```
 
 - 改密码/预置源无需重新打包：写到 `~/Library/Application Support/LibreTV/app.env`（优先级更高）。
+- 只在本机使用、不随安装包分发的源（如成人源）写在同一文件的 `EXTRA_SOURCES` 里，追加在预置源之后。
 - 观看历史、源配置存在 App 本地（IndexedDB）；从网页版迁移请用 设置 → 配置导入导出。
 - App 未签名，首次打开需右键 → 打开。
 
