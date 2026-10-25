@@ -37,11 +37,12 @@ export function Header({ showSearch = false }: { showSearch?: boolean }) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-page/75 backdrop-blur-xl border-b border-line/60">
+      <header className="sticky top-0 z-40 bg-page border-b border-line">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/" aria-label="LibreTV 首页" className="flex items-center shrink-0">
+          <Link href="/" aria-label="LibreTV 首页" className="flex items-center gap-2 shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icons/icon-512.png" alt="LibreTV" className="w-7 h-7 rounded-lg" />
+            <img src="/icons/icon-512.png" alt="" className="w-7 h-7 rounded-lg" />
+            <span className="text-base font-semibold text-content">LibreTV</span>
           </Link>
 
           {showSearch && (

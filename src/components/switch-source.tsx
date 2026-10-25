@@ -342,8 +342,8 @@ export function SwitchSourceModal({
                       onClick={() => setSelectedKey(key)}
                     >
                       <span className="max-w-[8rem] truncate font-medium">{c.source.name}</span>
-                      {isCurrent && <span className="text-[10px] opacity-80">当前</span>}
-                      {qLabel && <span className="text-[10px] tabular-nums opacity-70">{qLabel}</span>}
+                      {isCurrent && <span className="text-xs opacity-80">当前</span>}
+                      {qLabel && <span className="text-xs tabular-nums opacity-70">{qLabel}</span>}
                       {c.ok ? (
                         <span
                           className={cn(
@@ -353,7 +353,7 @@ export function SwitchSourceModal({
                           title={`${c.ms}ms`}
                         />
                       ) : (
-                        <span className="text-[10px] text-danger">失败</span>
+                        <span className="text-xs text-danger">失败</span>
                       )}
                     </button>
                   );
@@ -400,12 +400,12 @@ export function SwitchSourceModal({
                       </h3>
                       <QualityBadge entry={qualities[qKey]} loading={probing[qKey]} onRetry={() => retry([c.result])} />
                       {isCurrent && (
-                        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-accent/15 text-accent">播放中</span>
+                        <span className="shrink-0 text-xs px-1.5 py-0.5 rounded bg-accent/15 text-accent">播放中</span>
                       )}
                     </div>
                     <div className="mt-2 grid grid-cols-2 gap-2 sm:max-w-[16rem]">
                       <div className="rounded-md bg-chip px-2 py-1.5">
-                        <div className="text-[10px] text-faint">速度</div>
+                        <div className="text-xs text-faint">速度</div>
                         <div
                           className={cn(
                             'text-xs font-medium tabular-nums',
@@ -416,7 +416,7 @@ export function SwitchSourceModal({
                         </div>
                       </div>
                       <div className="rounded-md bg-chip px-2 py-1.5">
-                        <div className="text-[10px] text-faint">集数</div>
+                        <div className="text-xs text-faint">集数</div>
                         <div className="text-xs font-medium text-content">
                           {c.episodes ? `${c.episodes} 集` : '无资源'}
                         </div>

@@ -362,7 +362,7 @@ function LiveContent() {
                     }}
                   >
                     {copied ? (
-                      <span className="text-[10px] text-success">已复制</span>
+                      <span className="text-xs text-success">已复制</span>
                     ) : (
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
@@ -433,7 +433,7 @@ function LiveContent() {
                 />
               )}
               {(failedCount > 0 || sources.length === 0) && (
-                <p className="text-[10px] text-faint px-3 py-1.5 border-t border-line shrink-0">
+                <p className="text-xs text-faint px-3 py-1.5 border-t border-line shrink-0">
                   {sources.length === 0
                     ? liveEnvSources.length + liveSubscriptions.length > 0
                       ? '所有直播源均已停用，请在设置中勾选启用'

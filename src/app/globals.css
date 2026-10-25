@@ -77,7 +77,7 @@ body {
 
 @layer components {
   .card {
-    @apply bg-card border border-line rounded-lg overflow-hidden transition-all duration-200;
+    @apply bg-card border border-line rounded-lg overflow-hidden transition-[transform,background-color] duration-200;
   }
   .btn {
     @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
@@ -99,7 +99,7 @@ body {
   }
   /* 小尺寸按钮：定义在 .btn-* 之后，确保尺寸覆盖生效（与 .btn-primary / .btn-ghost 组合使用） */
   .btn-sm {
-    @apply btn px-2.5 py-1 text-xs;
+    @apply btn px-2.5 py-1 text-[13px];
   }
   /* 胶囊控件（筛选、分类标签）：统一内边距与圆角 */
   .chip {
@@ -127,26 +127,18 @@ body {
   color: rgb(var(--c-on-accent)) !important;
 }
 
-/* 品牌字：主文本色过渡到强调色 */
-.brand-gradient {
-  background: linear-gradient(to right, rgb(var(--c-content)), rgb(var(--c-accent)));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
 
-/* LIVE 呼吸红点（直播页标识） */
+/* LIVE 呼吸红点（直播页标识）：真实的直播状态信号 taste-skill-ignore */
 .live-dot {
   width: 8px;
   height: 8px;
   border-radius: 9999px;
-  background: #ef4444;
+  background: rgb(var(--c-danger));
   animation: live-breathe 2s ease-in-out infinite;
 }
 @keyframes live-breathe {
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
-  50% { opacity: 0.55; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0); }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
 }
 
 /*

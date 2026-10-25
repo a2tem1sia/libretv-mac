@@ -317,20 +317,20 @@ function WatchContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="sticky top-0 z-40 bg-surface/90 backdrop-blur border-b border-line">
+      <header className="sticky top-0 z-40 bg-page border-b border-line">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-3">
           <BackButton />
           <HomeButton />
           <div className="min-w-0">
-            <h1 className="text-sm font-medium text-content truncate">{videoTitle}</h1>
-            <p className="text-xs text-faint">
+            <h1 className="text-base font-semibold text-content truncate">{videoTitle}</h1>
+            <p className="text-[13px] text-faint truncate">
               {source.name}
               {episodes.length > 0 && ` · 第 ${currentIndex + 1}/${episodes.length} 集`}
             </p>
           </div>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2 shrink-0">
             <button
-              className="btn-ghost btn-sm"
+              className="btn-ghost btn-sm whitespace-nowrap"
               onClick={() => {
                 if (!currentUrl) return;
                 enqueueDownload({
@@ -345,7 +345,7 @@ function WatchContent() {
             >
               下载本集
             </button>
-            <button className="btn-ghost btn-sm" onClick={() => setSwitchOpen(true)}>
+            <button className="btn-ghost btn-sm whitespace-nowrap" onClick={() => setSwitchOpen(true)}>
               切换资源
             </button>
           </div>
@@ -355,7 +355,8 @@ function WatchContent() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4">
           <div>
-            <div ref={playerFrameRef} className="aspect-video bg-black rounded-lg overflow-hidden">
+            {/* data-ui：播放器自带控件（文字阴影等）属于真实界面，不按页面规则判 */}
+            <div ref={playerFrameRef} data-ui className="aspect-video bg-black rounded-lg overflow-hidden">
               {currentUrl ? (
                 <PlayerShell
                   url={currentUrl}
@@ -432,10 +433,10 @@ function WatchContent() {
                   <span className="ml-1 inline-block size-1.5 rounded-full bg-faint" aria-label="本剧跳过已关闭" />
                 )}
               </button>
-              <label className="flex items-center gap-1.5 text-xs text-muted ml-auto cursor-pointer">
+              <label className="flex items-center gap-1.5 text-[13px] text-muted ml-auto cursor-pointer">
                 <input
                   type="checkbox"
-                  className="h-3.5 w-3.5 accent-[#2563eb]"
+                  className="h-4 w-4 accent-[rgb(var(--c-accent))]"
                   checked={store.autoplayNext}
                   onChange={(e) => store.updateSettings({ autoplayNext: e.target.checked })}
                 />
@@ -447,9 +448,9 @@ function WatchContent() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
               <FeatureCard title="跳过片头片尾">
                 {markedCount > 0 ? (
-                  <p className="text-xs text-muted">本剧已手动标记 {markedCount} 段，以手动标记为准</p>
+                  <p className="text-[13px] text-muted">本剧已手动标记 {markedCount} 段，以手动标记为准</p>
                 ) : detecting ? (
-                  <p className="flex items-center gap-1.5 text-xs text-faint">
+                  <p className="flex items-center gap-1.5 text-[13px] text-faint">
                     <Spinner size="sm" />
                     正在识别片头片尾…
                   </p>
@@ -464,7 +465,7 @@ function WatchContent() {
                         onChange={(e) => store.setAutoSkipEnabled(episodeKey, e.target.checked)}
                       />
                     </label>
-                    <p className="text-xs text-faint" title="与相邻一集比对音频自动识别">
+                    <p className="text-[13px] text-faint tabular-nums" title="与相邻一集比对音频自动识别">
                       {autoMark.segments
                         .map((seg) => {
                           const isHead = seg.type === 'opening' || (seg.type === 'middle' && seg.start < 300);
@@ -475,7 +476,7 @@ function WatchContent() {
                     </p>
                   </>
                 ) : (
-                  <p className="text-xs text-faint">
+                  <p className="text-[13px] text-faint">
                     {autoMark ? '未识别到片头片尾' : episodes.length < 2 ? '单集影片无法自动识别' : '播放后自动识别'}
                   </p>
                 )}
@@ -487,8 +488,8 @@ function WatchContent() {
                       key={label}
                       aria-pressed={store.videoEnhance === level}
                       className={cn(
-                        'flex-1 rounded-md py-1 text-xs transition-colors',
-                        store.videoEnhance === level ? 'bg-hover text-content shadow' : 'text-muted hover:text-content'
+                        'flex-1 rounded-md py-1.5 text-[13px] transition-colors',
+                        store.videoEnhance === level ? 'bg-hover text-content' : 'text-muted hover:text-content'
                       )}
                       onClick={() => store.updateSettings({ videoEnhance: level as 0 | 1 | 2 })}
                     >
@@ -496,7 +497,7 @@ function WatchContent() {
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-faint">低清片源全屏时效果最明显</p>
+                <p className="text-[13px] text-faint">低清片源全屏时效果最明显</p>
               </FeatureCard>
               <FeatureCard title="去广告">
                 <label className="flex items-center justify-between gap-2 text-sm text-content cursor-pointer">
@@ -508,7 +509,7 @@ function WatchContent() {
                     onChange={(e) => store.updateSettings({ adFilter: e.target.checked })}
                   />
                 </label>
-                <p className="text-xs text-faint">切换后从下一次加载生效</p>
+                <p className="text-[13px] text-faint">切换后从下一次加载生效</p>
               </FeatureCard>
             </div>
 
@@ -534,7 +535,8 @@ function WatchContent() {
           </div>
 
           {/* 剧集侧栏 */}
-          <aside className="bg-card border border-line rounded-xl p-3 h-fit">
+          {/* 桌面端剧集栏高度跟随左栏（播放器 + 卡片），列表在栏内滚动，两栏底边对齐 */}
+          <aside className="bg-card border border-line rounded-xl p-3 flex flex-col lg:h-0 lg:min-h-full">
             <div className="flex items-center justify-between gap-2 mb-2.5">
               <h2 className="text-sm font-semibold text-content">
                 剧集列表{episodes.length > 0 && `（${episodes.length}）`}
@@ -562,7 +564,7 @@ function WatchContent() {
                 <EmptyState variant="plain" title={detailQuery.isError ? '获取剧集失败' : '暂无剧集信息'} />
               )
             ) : (
-              <div className="flex flex-col gap-0.5 max-h-[65vh] overflow-y-auto scrollbar-thin pr-1">
+              <div className="flex flex-col gap-0.5 max-h-[65vh] lg:max-h-none lg:flex-1 lg:min-h-0 overflow-y-auto scrollbar-thin pr-1">
                 {orderedEpisodes.map((realIndex) => (
                   <EpisodeButton
                     key={realIndex}
@@ -573,7 +575,7 @@ function WatchContent() {
                 ))}
               </div>
             )}
-            <p className="hidden md:block text-[10px] text-faint mt-3 leading-relaxed">
+            <p className="hidden md:block text-xs text-faint mt-3 leading-relaxed">
               快捷键：空格 播放/暂停 · ←/→ 快退/快进 5s · ↑/↓ 音量 · F 全屏 · Alt+←/→ 切换集数
             </p>
           </aside>
@@ -615,13 +617,13 @@ function EpisodeButton({ index, active, onClick }: { index: number; active: bool
       ref={ref}
       className={cn(
         'flex items-center justify-between rounded-lg px-3 py-2 text-sm text-left transition-colors',
-        active ? 'bg-accent text-on-accent' : 'text-content hover:bg-hover'
+        active ? 'bg-hover text-content font-medium' : 'text-muted hover:bg-hover hover:text-content'
       )}
       aria-current={active ? 'true' : undefined}
       onClick={onClick}
     >
       第 {index + 1} 集
-      {active && <span className="text-xs opacity-80">播放中</span>}
+      {active && <span className="text-[13px] text-accent-hover">播放中</span>}
     </button>
   );
 }

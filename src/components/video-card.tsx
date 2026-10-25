@@ -145,7 +145,7 @@ export function AggregatedCard({
   return (
     <div
       ref={inViewRef}
-      className={cn('card', !multi && 'hover:scale-[1.02] hover:shadow-md', multi && expanded && 'ring-1 ring-accent/40')}
+      className={cn('card', !multi && 'hover:bg-hover', multi && expanded && 'ring-1 ring-accent/40')}
     >
       {/* 不用 h-full：展开面板需要撑高卡片，等高裁切会让面板不可见 */}
       <div
@@ -171,7 +171,6 @@ export function AggregatedCard({
               className="absolute inset-0 h-full w-full object-cover"
               onExhausted={() => setImgFailed(true)}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
             {multi && (
               <span className="absolute top-1.5 left-1.5 tag bg-black/70 text-accent font-medium">
                 {group.items.length} 源
@@ -198,7 +197,7 @@ export function AggregatedCard({
             </h3>
             <div className="flex flex-wrap gap-1 mb-1.5">
               {group.typeName && <span className="tag bg-accent/15 text-accent">{group.typeName}</span>}
-              {group.year && <span className="tag bg-purple-500/15 text-purple-600 dark:text-purple-300">{group.year}</span>}
+              {group.year && <span className="tag bg-chip text-muted tabular-nums">{group.year}</span>}
               {adult && <span className="tag bg-pink-500/15 text-pink-600 dark:text-pink-400">(18+)</span>}
               {/* 单源卡片没有展开列表，画质只能在这里露出；失败态可点重试 */}
               {singleKey && (
@@ -209,7 +208,7 @@ export function AggregatedCard({
                 />
               )}
             </div>
-            <p className="text-xs text-muted line-clamp-2 mb-2">{group.remarks || '暂无介绍'}</p>
+            <p className="text-[13px] text-muted line-clamp-2 mb-2">{group.remarks || '暂无介绍'}</p>
           </div>
           <div className="flex items-center justify-between gap-1.5 mt-auto pt-1.5 border-t border-line">
             <span className="tag bg-chip text-muted truncate max-w-[80%]">
@@ -248,18 +247,18 @@ export function AggregatedCard({
       {multi && expanded && (
         <div className="border-t border-line p-2.5 animate-fade-in">
           <div className="flex items-baseline justify-between gap-2 mb-1.5">
-            <p className="text-[10px] text-faint">
+            <p className="text-xs text-faint">
               选择来源
               {sharedRemarks ? ` · 均 ${sharedRemarks}` : ''}
             </p>
             {progress.total > 0 &&
               (progress.done < progress.total ? (
-                <p className="text-[10px] text-faint tabular-nums">
+                <p className="text-xs text-faint tabular-nums">
                   探测中 {progress.done}/{progress.total}
                 </p>
               ) : (
                 // 探完后「3/3」已经没有信息量，换成用户真正要的结论
-                <p className="text-[10px] text-accent tabular-nums">
+                <p className="text-xs text-accent tabular-nums">
                   {progress.best ? `最高 ${progress.best}` : '未能探到画质'}
                   {progress.failed > 0 ? ` · ${progress.failed} 源未探到` : ''}
                 </p>
@@ -282,7 +281,7 @@ export function AggregatedCard({
                   tabIndex={0}
                   className={cn(
                     'group flex w-full min-w-0 items-center gap-2 rounded-lg border px-2.5 py-2',
-                    'text-xs transition-all cursor-pointer',
+                    'text-xs transition-colors cursor-pointer',
                     'bg-chip hover:border-accent hover:bg-accent/10',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50',
                     isBest ? 'border-accent/50' : 'border-line',
@@ -340,7 +339,7 @@ export function VideoCard({ item, onClick }: { item: SearchResultItem; onClick: 
 
   return (
     <div
-      className="card cursor-pointer hover:scale-[1.02] hover:shadow-md h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+      className="card cursor-pointer hover:bg-hover h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
       role="button"
       tabIndex={0}
       onClick={onClick}
@@ -363,7 +362,6 @@ export function VideoCard({ item, onClick }: { item: SearchResultItem; onClick: 
               className="h-full w-full object-cover"
               onExhausted={() => setImgFailed(true)}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
           </div>
         ) : (
           <div className="flex-shrink-0 w-[105px] sm:w-[120px] aspect-[2/3] bg-chip flex items-center justify-center">
@@ -380,9 +378,9 @@ export function VideoCard({ item, onClick }: { item: SearchResultItem; onClick: 
             </h3>
             <div className="flex flex-wrap gap-1 mb-1.5">
               {item.typeName && <span className="tag bg-accent/15 text-accent">{item.typeName}</span>}
-              {item.year && <span className="tag bg-purple-500/15 text-purple-600 dark:text-purple-300">{item.year}</span>}
+              {item.year && <span className="tag bg-chip text-muted tabular-nums">{item.year}</span>}
             </div>
-            <p className="text-xs text-muted line-clamp-2 mb-2">{formatRemarks(item.remarks) || '暂无介绍'}</p>
+            <p className="text-[13px] text-muted line-clamp-2 mb-2">{formatRemarks(item.remarks) || '暂无介绍'}</p>
           </div>
           <div className="flex items-center justify-between mt-auto pt-1.5 border-t border-line">
             <span className="tag bg-chip text-muted truncate max-w-[80%]">{item.sourceName}</span>
@@ -402,7 +400,7 @@ export function DoubanCard({ item, onClick }: { item: { title: string; cover: st
 
   return (
     <div
-      className="card cursor-pointer hover:scale-[1.03] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+      className="group cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
       role="button"
       tabIndex={0}
       onClick={onClick}
@@ -414,14 +412,14 @@ export function DoubanCard({ item, onClick }: { item: { title: string; cover: st
         }
       }}
     >
-      <div className="relative aspect-[2/3] bg-chip">
+      <div className="relative aspect-[2/3] bg-chip rounded-lg overflow-hidden">
         {item.cover && !imgFailed ? (
           <SmartImage
             url={item.cover}
             mode={imageProxyMode}
             customProxy={customImageProxy}
             alt={item.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             onExhausted={() => setImgFailed(true)}
           />
         ) : (
@@ -431,16 +429,12 @@ export function DoubanCard({ item, onClick }: { item: { title: string; cover: st
             </svg>
           </div>
         )}
-        {item.rating && (
-          <span className={cn('absolute top-1.5 right-1.5 tag bg-black/70 text-rating font-medium')}>
-            ★ {item.rating}
-          </span>
-        )}
       </div>
-      <div className="p-2">
-        <div className="text-xs font-medium text-content truncate" title={item.title}>
+      <div className="pt-2">
+        <div className="text-sm font-medium text-content truncate" title={item.title}>
           {item.title}
         </div>
+        {item.rating && <div className="text-[13px] text-faint tabular-nums">豆瓣 {item.rating}</div>}
       </div>
     </div>
   );

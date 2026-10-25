@@ -66,8 +66,8 @@ function DoubanView({ onPick }: { onPick: (title: string) => void }) {
           <button
             key={t}
             className={cn(
-              'px-2.5 py-1 rounded-full text-xs transition-colors',
-              t === tag ? 'bg-accent text-on-accent' : 'bg-chip text-muted hover:text-content hover:bg-hover'
+              'px-3 py-1.5 rounded-full text-[13px] transition-colors',
+              t === tag ? 'bg-content text-page' : 'bg-chip text-muted hover:text-content hover:bg-hover'
             )}
             onClick={() => setTag(t)}
           >
@@ -187,8 +187,8 @@ function GridSkeleton() {
     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
       {Array.from({ length: 16 }).map((_, i) => (
         <div key={i}>
-          <div className="aspect-[2/3] rounded-lg bg-chip animate-pulse" />
-          <div className="h-3 mt-2 rounded bg-chip animate-pulse" />
+          <div className="aspect-[2/3] rounded-lg bg-chip" />
+          <div className="h-3 mt-2 rounded bg-chip" />
         </div>
       ))}
     </div>
@@ -199,8 +199,8 @@ function ChipButton({ active, onClick, children }: { active: boolean; onClick: (
   return (
     <button
       className={cn(
-        'px-2.5 py-1 rounded-full text-xs transition-colors',
-        active ? 'bg-accent text-on-accent' : 'bg-chip text-muted hover:text-content hover:bg-hover'
+        'px-3 py-1.5 rounded-full text-[13px] transition-colors',
+        active ? 'bg-content text-page' : 'bg-chip text-muted hover:text-content hover:bg-hover'
       )}
       onClick={onClick}
     >
@@ -212,7 +212,7 @@ function ChipButton({ active, onClick, children }: { active: boolean; onClick: (
 function TypeButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
-      className={cn('px-3.5 py-1.5 rounded-md text-sm transition-colors', active ? 'bg-accent text-on-accent' : 'text-muted hover:text-content')}
+      className={cn('px-3.5 py-1.5 rounded-md text-sm transition-colors', active ? 'bg-hover text-content' : 'text-muted hover:text-content')}
       onClick={onClick}
       aria-pressed={active}
     >

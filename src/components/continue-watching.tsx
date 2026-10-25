@@ -76,14 +76,15 @@ function Hero({ item }: { item: HistoryEntry }) {
     <section className="relative -mx-4 sm:mx-0 mb-10 overflow-hidden sm:rounded-2xl bg-card">
       {/* 海报放大虚化做背景，压暗保证文字对比度 */}
       <Poster item={item} className="absolute inset-0 w-full h-full scale-110 blur-2xl opacity-40" />
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-page via-page/80 to-page/30" />
+      {/* 照片上的中性压暗层，保证文字对比度 */}
+      <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-page via-page/80 to-page/30" /> {/* taste-skill-ignore */}
       <div className="relative flex items-end gap-6 p-6 sm:p-10 min-h-[320px]">
-        <Poster item={item} className="hidden sm:block w-40 aspect-[2/3] rounded-xl shadow-2xl shrink-0" />
+        <Poster item={item} className="hidden sm:block w-40 aspect-[2/3] rounded-lg shrink-0" />
         <div className="flex flex-col gap-3 min-w-0 max-w-xl">
-          <div className="text-xs tracking-wider text-muted">
+          <div className="text-[13px] text-muted">
             继续观看{sourceName ? ` · ${sourceName}` : ''}
           </div>
-          <h2 className="text-3xl sm:text-5xl font-black text-content leading-tight line-clamp-2">{item.title}</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-content leading-tight line-clamp-2">{item.title}</h2>
           <div className="text-sm text-muted">
             {item.totalEpisodes > 1 && `第 ${item.episodeIndex + 1}/${item.totalEpisodes} 集`}
             {remaining > 0 && ` · 剩余 ${formatTime(remaining)}`}

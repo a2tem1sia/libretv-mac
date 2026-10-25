@@ -170,15 +170,10 @@ function HomeContent() {
 
       <main className="relative flex-1 max-w-7xl w-full mx-auto px-4 py-6">
         {/* 搜索区 */}
-        <section className={cn('flex flex-col items-center', urlQuery ? 'mb-6' : 'mt-8 mb-8')}>
-          {!urlQuery && (
-            <header className="text-center mb-6">
-              <h1 className="text-4xl sm:text-5xl font-bold brand-gradient">LibreTV</h1>
-            </header>
-          )}
-          {urlQuery && <h1 className="sr-only">LibreTV 视频搜索</h1>}
+        <section className="flex flex-wrap items-center gap-x-6 gap-y-3 mb-8">
+          <h1 className="text-2xl font-semibold text-content shrink-0">{urlQuery ? '搜索结果' : '影视库'}</h1>
           {/* 定位容器比胶囊宽一圈：浮层按它的宽度对齐，接缝处不会与胶囊边框错位 1px */}
-          <div ref={searchHistory.containerRef} className="relative w-full max-w-2xl">
+          <div ref={searchHistory.containerRef} className="relative flex-1 min-w-[280px]">
             <form
               className="w-full"
               onSubmit={(e) => {
@@ -294,8 +289,8 @@ function HomeContent() {
                 <span className="text-faint">{isSearching ? '以下源暂时无响应：' : '部分点播源请求失败：'}</span>
                 {failures.map((f) => (
                   <span key={f.sourceKey} className={f.timedOut ? 'text-warning' : 'text-faint'}>
-                    {f.timedOut ? '⏱' : '✗'} {sourceName(f.sourceKey)}
-                    {f.timedOut ? ' 超时' : ''}
+                    {sourceName(f.sourceKey)}
+                    {f.timedOut ? ' 超时' : ' 失败'}
                   </span>
                 ))}
               </div>
@@ -380,11 +375,11 @@ function ResultsSkeleton() {
       {Array.from({ length: 6 }).map((_, i) => (
         // 结构对齐真实结果卡（左侧缩略图 + 右侧文字块），避免占位与真实卡片形状不符
         <div key={i} className="card flex h-28 overflow-hidden">
-          <div className="w-[105px] sm:w-[120px] shrink-0 bg-chip animate-pulse" />
+          <div className="w-[105px] sm:w-[120px] shrink-0 bg-chip" />
           <div className="flex-1 p-2.5 space-y-2">
-            <div className="h-4 w-3/4 rounded bg-chip animate-pulse" />
-            <div className="h-3 w-1/2 rounded bg-chip animate-pulse" />
-            <div className="h-3 w-full rounded bg-chip animate-pulse" />
+            <div className="h-4 w-3/4 rounded bg-chip" />
+            <div className="h-3 w-1/2 rounded bg-chip" />
+            <div className="h-3 w-full rounded bg-chip" />
           </div>
         </div>
       ))}
@@ -403,7 +398,7 @@ function NoSourceGuide({ hasSources = false }: { hasSources?: boolean }) {
         ) : (
           <>
             LibreTV 不内置任何采集站。点击右上角「设置 → 添加 API」，填入一个
-            Apple CMS 采集站地址（如 <code className="text-accent text-xs">https://example.com/api.php/provide/vod</code>），
+            Apple CMS 采集站地址（如 <code className="text-accent text-xs">https://采集站域名/api.php/provide/vod</code>），
             勾选后即可开始搜索。
           </>
         )}
