@@ -33,8 +33,8 @@ function startServer() {
     env: {
       ...process.env,
       ...env,
-      // 片头片尾识别用的 ffmpeg：打包版在 Resources，开发时用 ffmpeg-static
-      FFMPEG_PATH: app.isPackaged ? path.join(root, 'ffmpeg') : require('ffmpeg-static'),
+      // 片头片尾识别用的 ffmpeg：打包版在 Resources，开发时用 scripts/fetch-ffmpeg.mjs 下载的
+      FFMPEG_PATH: app.isPackaged ? path.join(root, 'ffmpeg') : path.join(root, 'vendor', `ffmpeg-${process.arch}`),
       NODE_ENV: 'production',
       PORT: String(PORT),
       HOSTNAME: '127.0.0.1',

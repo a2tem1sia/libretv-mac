@@ -16,3 +16,4 @@ generated-images/
 dist/
 electron/app.env
 .DS_Store
+vendor/

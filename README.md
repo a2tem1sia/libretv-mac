@@ -21,7 +21,7 @@ LibreTV Next.js 迁移版：免费在线视频聚合搜索与观看平台。基�
 cp electron/app.env.example electron/app.env   # 填 PASSWORD，可选 DEFAULT_SOURCES 等
 npm install
 npm run app:dev     # 构建并以开发模式打开
-npm run app:dist    # 打包 dist/LibreTV-<版本>-arm64.dmg
+npm run app:dist    # 打包 dist/LibreTV-<版本>-arm64.dmg（Apple 芯片）和 -x64.dmg（Intel）
 ```
 
 - 改密码/预置源无需重新打包：写到 `~/Library/Application Support/LibreTV/app.env`（优先级更高）。

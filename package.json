@@ -11,9 +11,9 @@
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "app:dev": "npm run app:prepare && electron .",
+    "app:dev": "npm run app:prepare && node scripts/fetch-ffmpeg.mjs && electron .",
     "app:prepare": "DOCKER_BUILD=1 next build && cp -R .next/static .next/standalone/.next/static && cp -R public .next/standalone/public",
-    "app:dist": "npm run app:prepare && electron-builder --mac"
+    "app:dist": "npm run app:prepare && node scripts/fetch-ffmpeg.mjs && electron-builder --mac"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.59.0",
@@ -38,7 +38,6 @@
     "electron-builder": "^26.18.0",
     "eslint": "^9.39.4",
     "eslint-config-next": "^15.5.25",
-    "ffmpeg-static": "^5.3.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
     "typescript": "^5.7.2",
@@ -71,7 +70,7 @@
         "to": "app.env"
       },
       {
-        "from": "node_modules/ffmpeg-static/ffmpeg",
+        "from": "vendor/ffmpeg-${arch}",
         "to": "ffmpeg"
       }
     ],
@@ -80,13 +79,15 @@
         {
           "target": "dmg",
           "arch": [
-            "arm64"
+            "arm64",
+            "x64"
           ]
         }
       ],
       "category": "public.app-category.entertainment",
       "icon": "public/icons/icon-512.png",
       "identity": null
-    }
+    },
+    "artifactName": "${productName}-${version}-${arch}.${ext}"
   }
 }
