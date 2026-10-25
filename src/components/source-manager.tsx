@@ -281,6 +281,32 @@ function VodSourcesPanel() {
 
   const empty = store.envSources.length === 0 && store.customAPIs.length === 0;
 
+  const renderRow = (source: SourceConfig) => (
+    <VodSourceRow
+      key={source.key}
+      api={source}
+      isEnv={envKeys.has(source.key)}
+      editing={editing === source.key}
+      onEdit={setEditing}
+      onCancelEdit={() => setEditing(null)}
+      onUpdate={(data) => {
+        store.updateCustomApi(source.key, data);
+        setEditing(null);
+      }}
+      testState={tests[source.key]}
+      onTest={() =>
+        runTest(source.key, async () => {
+          const r = await api.testSource(source.url);
+          // 手动测试也写入健康度，与搜索 / 批量测活共用同一份模型（不再存在两套健康度）
+          useAppStore.getState().recordSourceHealth([
+            { sourceKey: source.key, ok: r.ok, ms: r.ms, error: r.error, list: [] },
+          ]);
+          return r;
+        })
+      }
+    />
+  );
+
   return (
     <section>
       <SectionTitle
@@ -374,33 +400,24 @@ function VodSourcesPanel() {
           {filtered.length === 0 ? (
             <EmptyState variant="plain" title="没有符合条件的源" />
           ) : (
-            <ul className="space-y-2">
-              {filtered.map((source) => (
-                <VodSourceRow
-                  key={source.key}
-                  api={source}
-                  isEnv={envKeys.has(source.key)}
-                  editing={editing === source.key}
-                  onEdit={setEditing}
-                  onCancelEdit={() => setEditing(null)}
-                  onUpdate={(data) => {
-                    store.updateCustomApi(source.key, data);
-                    setEditing(null);
-                  }}
-                  testState={tests[source.key]}
-                  onTest={() =>
-                    runTest(source.key, async () => {
-                      const r = await api.testSource(source.url);
-                      // 手动测试也写入健康度，与搜索 / 批量测活共用同一份模型（不再存在两套健康度）
-                      useAppStore.getState().recordSourceHealth([
-                        { sourceKey: source.key, ok: r.ok, ms: r.ms, error: r.error, list: [] },
-                      ]);
-                      return r;
-                    })
-                  }
-                />
-              ))}
-            </ul>
+            <>
+              <ul className="space-y-2">{filtered.filter((s) => !s.isAdult).map(renderRow)}</ul>
+              {/* 成人源单独成组：成人过滤开启时默认收起，且不参与搜索 */}
+              {filtered.some((s) => s.isAdult) && (
+                <details className="group mt-6" open={!store.yellowFilter}>
+                  <summary className="flex items-baseline justify-between gap-3 cursor-pointer list-none mb-2">
+                    <span className="text-sm font-semibold text-content">
+                      成人源（18+）· {filtered.filter((s) => s.isAdult).length}
+                      <span className="ml-2 text-xs font-normal text-faint group-open:hidden">展开</span>
+                    </span>
+                    <span className="text-xs text-faint">
+                      {store.yellowFilter ? '成人内容过滤开启中，这些源不参与搜索' : '已允许成人内容'}
+                    </span>
+                  </summary>
+                  <ul className="space-y-2">{filtered.filter((s) => s.isAdult).map(renderRow)}</ul>
+                </details>
+              )}
+            </>
           )}
         </>
       )}
