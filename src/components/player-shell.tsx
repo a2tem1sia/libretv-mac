@@ -568,12 +568,17 @@ export function PlayerShell({
 
     // 画质增强：设置面板切档，档位全局记忆
     let enhancer: VideoEnhancer | null = null;
+    let unsubscribeEnhance: (() => void) | undefined;
     try {
       enhancer = new VideoEnhancer(art.video, (msg) => {
         art.notice.show = msg;
       });
       const initial = useAppStore.getState().videoEnhance;
       enhancer.setLevel(initial);
+      // 播放页卡片也能切档：跟随 store 变化
+      unsubscribeEnhance = useAppStore.subscribe((st, prev) => {
+        if (st.videoEnhance !== prev.videoEnhance) enhancer?.setLevel(st.videoEnhance);
+      });
       const labels: Record<EnhanceLevel, string> = { 0: '关闭', 1: '标准', 2: '强' };
       art.setting.add({
         html: '画质增强',
@@ -942,6 +947,7 @@ export function PlayerShell({
       getVideoPrefetcher().stop();
       // 播放页可能仍持有读取接口：销毁前显式置空，避免「记录当前」读到已销毁实例
       propsRef.current.onPlayerApi?.(null);
+      unsubscribeEnhance?.();
       enhancer?.destroy();
       art.destroy();
       artRef.current = null;

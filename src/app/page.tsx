@@ -16,6 +16,7 @@ import { useToast } from '@/components/toast';
 import { EmptyState } from '@/components/states';
 import { Icon } from '@/components/icon';
 import { SiteFooter } from '@/components/site-footer';
+import { ContinueWatching } from '@/components/continue-watching';
 
 /**
  * 首页：搜索（URL ?s= 驱动，可后退/分享）+ 豆瓣推荐。
@@ -167,19 +168,7 @@ function HomeContent() {
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      <main className="relative flex-1 max-w-6xl w-full mx-auto px-4 py-6">
-        {/* 首屏氛围渐变 */}
-        {!urlQuery && (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-[420px] -z-10"
-            style={{
-              background:
-                'radial-gradient(60% 60% at 50% 0%, rgba(35,173,229,0.10) 0%, rgba(35,173,229,0.03) 45%, transparent 75%)',
-            }}
-          />
-        )}
-
+      <main className="relative flex-1 max-w-7xl w-full mx-auto px-4 py-6">
         {/* 搜索区 */}
         <section className={cn('flex flex-col items-center', urlQuery ? 'mb-6' : 'mt-8 mb-8')}>
           {!urlQuery && (
@@ -363,6 +352,9 @@ function HomeContent() {
             )}
           </section>
         )}
+
+        {/* 沉浸式主推 + 继续观看（有搜索时隐藏） */}
+        {!urlQuery && <ContinueWatching />}
 
         {/* 首页推荐（有搜索时隐藏） */}
         {!urlQuery && (

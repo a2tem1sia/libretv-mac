@@ -36,33 +36,30 @@
 }
 
 .dark {
-  /* 旧版 LibreTV（backup-2025）赛博影视主题（整体调深一档）：深蓝黑底 + 霓虹蓝/粉点缀 */
-  --c-page: 11 16 26;              /* #0b101a 深蓝黑页面底色 */
-  --c-surface: 20 28 41;           /* #141c29 弹窗/抽屉底色 */
-  --c-surface-raised: 20 28 41;
-  --c-card: 13 20 31;              /* #0d141f 卡片底色 */
-  --c-chip: 22 32 46;              /* #16202e 卡片/输入框底色 */
-  --c-hover: 29 42 61;             /* #1d2a3d 悬停态（chip 提亮） */
-  --c-line: 34 48 69;              /* #223045 边框（近似旧版 rgba(0,204,255,.15) 观感） */
-  --c-content: 230 242 255;        /* #e6f2ff 蓝白主文本（--text-color） */
-  --c-muted: 133 153 178;          /* #8599b2 次级文本（--text-muted） */
-  --c-faint: 122 140 166;          /* #7a8ca6 三级文本（原 #6b7f99 在抽屉底色 #141c29 上仅 4.17:1，12px 小字不达标；提亮后 4.99:1） */
-  --c-accent: 0 184 230;           /* #00b8e6 霓虹蓝主色（--primary-color 调深一档） */
-  --c-accent-hover: 51 214 255;    /* #33d6ff 霓虹蓝浅变体（--primary-light） */
-  /* 霓虹蓝底亮度过高（对白字仅 2.35:1），暗色下实心底改用深色文字 */
-  --c-on-accent: 8 19 31;
-  /* 语义状态色（暗色主题取中等明度值，保证深蓝黑底上的对比度） */
-  --c-danger: 239 68 68;           /* red-500 */
-  --c-danger-hover: 248 113 113;   /* red-400 */
-  --c-success: 34 197 94;          /* green-500 */
-  --c-warning: 245 158 11;         /* amber-500 */
-  --c-info: 59 130 246;            /* blue-500 */
-  --c-rating: 251 191 36;          /* amber-400 */
-  /* 实心状态底色（配白字）：与亮色一致取深档，避免琥珀/绿色底白字对比度不足 */
-  --c-danger-solid: 185 28 28;     /* red-700 */
-  --c-success-solid: 21 128 61;    /* green-700 */
-  --c-warning-solid: 180 83 9;     /* amber-700 */
-  --c-info-solid: 29 78 216;       /* blue-700 */
+  /* 沉浸式影院深色（Apple TV 风格）：中性纯黑底 + 系统蓝强调色 */
+  --c-page: 10 10 12;              /* #0a0a0c 页面底色 */
+  --c-surface: 22 22 24;           /* #161618 弹窗/抽屉底色 */
+  --c-surface-raised: 28 28 31;
+  --c-card: 18 18 20;              /* #121214 卡片底色 */
+  --c-chip: 28 28 31;              /* #1c1c1f 输入框/标签底色 */
+  --c-hover: 42 42 46;             /* #2a2a2e 悬停态 */
+  --c-line: 44 44 48;              /* #2c2c30 边框 */
+  --c-content: 245 245 247;        /* #f5f5f7 主文本 */
+  --c-muted: 174 174 178;          /* #aeaeb2 次级文本 */
+  --c-faint: 142 142 147;          /* #8e8e93 三级文本（抽屉底色上 5.6:1） */
+  --c-accent: 10 132 255;          /* #0a84ff 系统蓝 */
+  --c-accent-hover: 64 156 255;    /* #409cff */
+  --c-on-accent: 255 255 255;
+  --c-danger: 255 69 58;           /* #ff453a */
+  --c-danger-hover: 255 105 97;
+  --c-success: 48 209 88;          /* #30d158 */
+  --c-warning: 255 159 10;         /* #ff9f0a */
+  --c-info: 10 132 255;
+  --c-rating: 255 214 10;          /* #ffd60a */
+  --c-danger-solid: 185 28 28;
+  --c-success-solid: 21 128 61;
+  --c-warning-solid: 180 83 9;
+  --c-info-solid: 29 78 216;
   color-scheme: dark;
 }
 
@@ -71,10 +68,7 @@ body {
   @apply bg-page text-content antialiased;
 }
 
-/* 暗色主题：模拟旧版 .page-bg 的深蓝黑纵向渐变 */
-.dark body {
-  background: linear-gradient(180deg, rgb(11 16 26), rgb(20 28 41)) fixed;
-}
+
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC',
@@ -133,9 +127,9 @@ body {
   color: rgb(var(--c-on-accent)) !important;
 }
 
-/* 品牌渐变字（沿用旧版 LibreTV 的霓虹蓝→霓虹粉） */
+/* 品牌字：主文本色过渡到强调色 */
 .brand-gradient {
-  background: linear-gradient(to right, #00ccff, #ff3c78);
+  background: linear-gradient(to right, rgb(var(--c-content)), rgb(var(--c-accent)));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
